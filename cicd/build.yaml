@@ -1,0 +1,66 @@
+trigger:
+- main
+
+variables:
+  resourceGroupName: 'rn-express-api-rg'
+  appServiceName: 'rn-express-api-app'
+
+pool:
+  name: 'rntestshpool'
+
+stages:
+- stage: Build
+  jobs:
+  - job: Build
+    steps:
+    - task: CopyFiles@2
+      inputs:
+        contents: '/api/app.js'
+        targetFolder: '$(Build.ArtifactStagingDirectory)'
+
+    - publish: $(Build.ArtifactStagingDirectory)
+      artifact: drop
+
+- stage: Deploy
+  jobs:
+  - deployment: Deploy
+    environment: production
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: DownloadBuildArtifacts@0
+            inputs:
+              buildType: 'current'
+              downloadType: 'single'
+              artifactName: 'drop'
+              downloadPath: '$(System.ArtifactsDirectory)'
+
+          - task: TerraformInstaller@1
+            inputs:
+             terraformVersion: 'latest'
+
+          - task: TerraformCLI@1
+            inputs:
+              provider: 'azurerm'
+              command: 'init'
+              workingDirectory: '$(System.DefaultWorkingDirectory)/infra'
+              environmentServiceName: 'rntestsc'
+
+          - task: TerraformCLI@1
+            inputs:
+              provider: 'azurerm'
+              command: 'apply'
+              commandOptions: '-auto-approve'
+              workingDirectory: '$(System.DefaultWorkingDirectory)/infra'
+              environmentServiceName: 'rntestsc'
+
+          - task: AzureWebApp@1
+            inputs:
+              azureSubscription: 'rntestsc'
+              appName: '$(appServiceName)'
+              appType: 'webApp'
+              deployToSlotOrASE: true
+              resourceGroupName: '$(resourceGroupName)'
+              slotName: 'production'
+              packageForLinux: '$(System.ArtifactsDirectory)/drop/'
