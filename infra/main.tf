@@ -46,6 +46,23 @@ terraform {
   }
 }
 
+#adding deployment slots for staging and prod:
+resource "azurerm_app_service_slot" "rn_test_app_service_staging_slot" {
+  name                = "staging"
+  app_service_name    = azurerm_app_service.rn_test_app_service.name
+  location            = azurerm_resource_group.rn_test_resource_group.location
+  resource_group_name = azurerm_resource_group.rn_test_resource_group.name
+  app_service_plan_id = azurerm_app_service_plan.rn_test_app_service_plan.id
+}
+
+resource "azurerm_app_service_slot" "rn_test_app_service_production_slot" {
+  name                = "production"
+  app_service_name    = azurerm_app_service.rn_test_app_service.name
+  location            = azurerm_resource_group.rn_test_resource_group.location
+  resource_group_name = azurerm_resource_group.rn_test_resource_group.name
+  app_service_plan_id = azurerm_app_service_plan.rn_test_app_service_plan.id
+}
+
 resource "azurerm_app_service_plan" "rn_test_app_service_plan" {
   name                = "rn-express-api-plan"
   location            = azurerm_resource_group.rn_test_resource_group.location
