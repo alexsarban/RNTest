@@ -16,12 +16,12 @@ resource "azurerm_resource_group" "rn_test_storage_rg" {
   location = "UK South"
 }
 
-#terraform state file resources for remote state (rg, storage account and blob)
 resource "azurerm_resource_group" "rn_test_resource_group" {
   name     = "rn-express-api-rg"
   location = "UK South"
 }
 
+#terraform state file resources for remote state (rg, storage account and blob)
 resource "azurerm_storage_account" "rn_test_storage_account" {
   name                     = "rnteststorage123" # Must be globally unique
   resource_group_name      = azurerm_resource_group.rn_test_storage_rg.name
