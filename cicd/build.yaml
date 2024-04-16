@@ -62,5 +62,6 @@ stages:
               appType: 'webApp'
               deployToSlotOrASE: true
               resourceGroupName: '$(resourceGroupName)'
+              #slot name to be changed to staging when needed
               slotName: 'production'
               packageForLinux: '$(System.ArtifactsDirectory)/drop/'
